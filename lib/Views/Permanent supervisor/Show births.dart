@@ -1,239 +1,187 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-class BirthRecordScreen extends StatelessWidget {
+import '../../Controller/Show_AllDeaths.dart';
+
+
+import '../../Controller/Show_All_Births.dart';
+import '../../Models/All_Births.dart';
+import '../admen/dashboard.dart';
+
+class BirthsRecordScreen extends StatefulWidget {
+  @override
+  _BirthsRecordScreenState createState() => _BirthsRecordScreenState();
+}
+
+class _BirthsRecordScreenState extends State<BirthsRecordScreen> {
+  List<AllBirths> b = [];
+  ShowAllBirths showAllbirths = ShowAllBirths();
+  List<dynamic> data = [];
+  var serverUrl = "http://127.0.0.1:8000";
+
+  Future<void> fetchData() async {
+    String myUrl = "$serverUrl/api/births/all";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    http.Response response = await http.get(Uri.parse(myUrl), headers: {
+      'Accept': 'application/json',
+      'token':
+      'eyJpZCI6OCwibmFtZSI6IkFkbWlzc2lvbk1vbml0b3IiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9'
+    });
+    final responseData = json.decode(response.body);
+    print(responseData);
+    setState(() {
+      data = responseData;
+    });
+  }
+
+  @override
+  void initState() {
+    showAllbirths.getData().then((birthsData) {
+      setState(() {
+        b = birthsData;
+      });
+    }).catchError((error) {
+      // Handle the error
+      print('Error fetching patient data: $error');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: 800,
-              width: 900,
-              margin: const EdgeInsets.only(top: 1, left: 80),
-              child: ListView(
-                children: [
-                  SizedBox(height: 20.0),
-                  Container(
-                    width: 20.0,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "البحث عن مريض ",
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black26),
-                        ),
-                        suffixIcon: Icon(
-                          Icons.search,
-                          color: Colors.teal,
-                        ), // يمكنك استبدال "Icons.search" بأيقونة بحث أخرى
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20.0),
-                  DeathRecordCard(
-                    name: 'لمى الشريطي',
-                    dateOfBirth: '01/01/1999',
-                    dateOfDeath: '05/15/2021',
-                    placeOfDeath: 'مشفى زيد الشريطي',
-                    causeOfDeath: 'حادث سير',
-                    phonenumber: '093216547',
-                    fetalweight: '4 كيلو غرام',
-                    dateofdiagnosis: '1/1/2032',
-                    numberofembryos: '1',
-                    birthofthefetus: '2/8/2023',
-                    typeofbirth: 'طبيعية',
-                  ),
-                  SizedBox(height: 15.0),
-                  DeathRecordCard(
-                    name: 'مرح العلي',
-                    dateOfBirth: '03/10/1980',
-                    dateOfDeath: '06/20/2023',
-                    placeOfDeath: 'المنزل',
-                    causeOfDeath: 'جلطة دماغية',
-                    phonenumber: '09987654',
-                    fetalweight: '3 كيلو غرام',
-                    dateofdiagnosis: '1/1/2032',
-                    typeofbirth: 'قيصرية',
-                    numberofembryos: '1',
-                    birthofthefetus: '2/8/2023',
-                  ),
-                ],
+      appBar: AppBar(   automaticallyImplyLeading: false,
+        backgroundColor: Colors.white60,
+        centerTitle: true,
+
+
+        title: Text(
+          'قسم الولادات  في المشفى الوطني للسويداء',
+          style: TextStyle(color: Colors.blue[600], fontSize: 20,fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: Column(
+        children: [
+          Container(
+            height: 80,
+            width: 500,
+            margin: const EdgeInsets.only(top: 50, left: 20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(
+                30.0,
               ),
             ),
-          ],
-        ),
+            child: TextFormField(
+              decoration: InputDecoration(
+                hintText: 'ابحث عن اسم...',
+                icon: Icon(Icons.search, color: Colors.teal),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                // crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: []),
+          ),
+          SizedBox(
+            height: 15,
+          ),
+          Expanded(
+            child: Container(
+              width: 1200,
+              child: ListView.builder(
+                itemCount: b.length,
+                itemBuilder: (context, index) {
+                  final deaths = b[index];
+                  return Card(
+                    margin: EdgeInsets.all(10),
+                    color: Colors.blue[100],
+                    child: ListTile(
+                      title: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: <Widget>[
+                            Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {},
+                                  child: Text(
+                                    'حذف',
+                                    style: TextStyle(
+                                        color: Colors.pink.shade500,
+                                        fontSize: 16.0),
+                                  ),
+                                ),
+                                SizedBox(width: 10.0),
+                                ElevatedButton(
+                                  onPressed: () {},
+                                  child: Text(
+                                    'طباعة التقرير',
+                                    style: TextStyle(
+                                        color: Colors.pink.shade500,
+                                        fontSize: 16.0),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Text(
+                                "الإسم: "
+                                    "${deaths.name}",
+                                style: TextStyle(fontSize: 20)),
+                            SizedBox(height: 8),
+
+
+                            Text(
+                                "مكان الولادة: "
+                                    "${deaths.city}",
+                                style: TextStyle(fontSize: 20)),
+                            SizedBox(height: 8),
+                            Text(
+                                "تاريخ الولادة: "
+                                    "${deaths.birthDate}",
+                                style: TextStyle(fontSize: 20)),
+                            SizedBox(height: 8),
+
+
+                            Text(
+                                "اسم الأب: "
+                                    "${deaths.fatherName}",
+                                style: TextStyle(fontSize: 20)),
+                            SizedBox(height: 8),
+                            Text(
+                                "اسم الأم: "
+                                    "${deaths.motherName}",
+                                style: TextStyle(fontSize: 20)),
+                            SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                      onTap: () {
+                        //   _showPatientDetails(context, patients[index]);
+                      },
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
-
-class DeathRecordCard extends StatelessWidget {
-  final String name;
-  final String dateOfBirth;
-  final String dateOfDeath;
-  final String placeOfDeath;
-  final String causeOfDeath;
-  final String phonenumber;
-  final String fetalweight;
-  final String dateofdiagnosis;
-  final String typeofbirth;
-  final String numberofembryos;
-  final String birthofthefetus;
-
-  DeathRecordCard({
-    required this.name,
-    required this.dateOfBirth,
-    required this.dateOfDeath,
-    required this.placeOfDeath,
-    required this.causeOfDeath,
-    required this.phonenumber,
-    required this.fetalweight,
-    required this.dateofdiagnosis,
-    required this.typeofbirth,
-    required this.numberofembryos,
-    required this.birthofthefetus,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.all(5.0),
-      color: Colors.white60,
-      elevation: 4.0,
-      child: Padding(
-        padding: EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: printPatientReport,
-                  child: Text(
-                    'طباعة التقرير',
-                    style:
-                        TextStyle(color: Colors.green.shade700, fontSize: 16.0),
-                  ),
-                ),
-                Text(
-                  'تفاصيل الحمل والولادة',
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue[700]),
-                ),
-                Text(
-                  ' معلومات الأم',
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue[700]),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '  ',
-                ),
-                Text(
-                  ' نوع الولادة : $dateOfBirth',
-                ),
-                Text(
-                  'اسم الأم: $name',
-                ),
-              ],
-            ),
-            SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '  ',
-                ),
-                Text(
-                  ' عدد الأجنة : $numberofembryos',
-                ),
-                Text(
-                  'تاريخ الولادة:  $dateOfBirth',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '  ',
-                ),
-                Text(
-                  ' تاريخ الولادة : $birthofthefetus',
-                ),
-                Text(
-                  'معلومات الإتصال:  $phonenumber',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'معلومات الجنين  ',
-                  style: TextStyle(
-                    color: Colors.blue[700],
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'وزن الجنين: $fetalweight',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'تاريخ التشخيص:   $dateofdiagnosis',
-                  style: TextStyle(color: Colors.black),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-void printPatientReport() {
-  // Printing.layoutPdf(onLayout: (format) {
-  //   final pdf = PdfDocument();
-  //   pdf.addPage(
-  //     PdfPage(
-  //       build: (PdfPageContext context) {
-  //         return Center(
-  //           child: Text('Patient Report\\n\\n$label $value'),
-  //         );
-  //       },
-  //     ),
-  //   );
-  //   return pdf.save();
-  // });
-}
+//   void _showPatientDetails(BuildContext context, Patient patient) {
+//     Navigator.push(
+//       context,
+//       MaterialPageRoute(
+//           builder: (context) => PatientDetailsPage(patient: patient)),
+//     );
+//   }
+// }

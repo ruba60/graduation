@@ -4,7 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+
 import '../../Controller/x_raycontroller.dart';
+import '../../Logout.dart';
 import '../../Models/x_raymodel.dart';
 
 
@@ -45,8 +47,8 @@ class _X_RayState extends State<X_Ray> {
             Icons.arrow_back_sharp,
           ),
           onPressed: () {
-            // Navigator.push(
-            //     context, MaterialPageRoute(builder: (context) => HomePage()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MainView()));
           },
         ),
         title: const Text(

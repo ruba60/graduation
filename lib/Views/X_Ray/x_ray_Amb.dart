@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../Logout.dart';
 import '../../Models/xray_amb_model.dart';
 import '../../controller/xray_Amb_controller.dart';
 
@@ -43,8 +45,8 @@ class _X_Ray_AmbState extends State<X_Ray_Amb> {
             Icons.arrow_back_sharp,
           ),
           onPressed: () {
-            // Navigator.push(
-            //     context, MaterialPageRoute(builder: (context) => HomePage()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MainView()));
           },
         ),
         title: const Text(

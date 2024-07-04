@@ -2,38 +2,28 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:http/http.dart' as http;
 
 
+import '../../Controller/Show_All_Department.dart';
+import '../../Models/all_department.dart';
 import 'AddPatient.dart';
 import 'Ambulance.dart';
 
-final List<String> _departments = [
-  'اسعاف',
-  'مراقب الدوام',
-  'ادمن',
-  'قسم الأطفال',
-  'قسم الهضمية',
-  'قسم العظمية',
-  'قسم النسائية',
-  'قسم الأشعة',
-  'قسم المخابر',
-  'قسم الجراحة',
-  'قسم البولية',
-  'قسم الصدرية',
-  'قسم القلبية',
-  'قسم الجلدية',
-  'قسم الأعصاب',
-  // Add other departments here
-];
 
 
 class PatientDetailsPage extends StatefulWidget {
 
   String? full_name;
-// String? caseDescription;
-// String? treatmentRequired;
+ String? caseDescription;
+ String? treatmentRequired;
+ String? id;
   PatientDetailsPage({super.key, required this.full_name,
+    required this.caseDescription,
+    required this.treatmentRequired,
+    required this.id,
   });
 
   @override
@@ -45,12 +35,30 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
 
 // final Patient patient;
   String? _selectedDepartment;
+  int? _selectedDepartmentId;
+  ShowAllDepartment showAllDepartment = ShowAllDepartment();
+
+  List<AllDepartment> getalldepartment = [];
 
   //PatientDetailsPage({required this.patient});
 
   TextEditingController textController = TextEditingController();
 
 
+  @override
+  void initState() {
+    super.initState();
+
+
+    showAllDepartment.getData().then((departmentsData) {
+      setState(() {
+        getalldepartment = departmentsData;
+      });
+    }).catchError((error) {
+      // Handle the error
+      print('Error fetching patient data: $error');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +137,7 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                     const SizedBox(
                       height: 10,
                     ),
-                    Text("caseDescription",
+                    Text("${widget.caseDescription}",
                         style:
                         TextStyle(fontSize: 15, color: Colors.black)),
                     const SizedBox(
@@ -145,7 +153,7 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                     const SizedBox(
                       height: 10,
                     ),
-                    Text( "treatmentRequired",
+                    Text( "${widget.treatmentRequired}",
                         style:
                         TextStyle(fontSize: 15, color: Colors.black)),
                   ],
@@ -155,7 +163,7 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => AddPatient()));
+                          builder: (context) => Add()));
                 },
                 child: Text(
                   'تعديل',
@@ -191,46 +199,67 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  DropdownButton<String>(
+                                  DropdownButtonFormField<String>(
+                                    decoration: const InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                      ),
+                                    ),
+                                    hint: Text('اختر القسم'),
                                     value: _selectedDepartment,
                                     onChanged: (String? newValue) {
                                       setState(() {
                                         _selectedDepartment = newValue;
+                                        _selectedDepartmentId = getalldepartment
+                                            .firstWhere((department) =>
+                                        department.name == newValue)
+                                            .id;
                                       });
                                     },
-                                    items:
-                                        _departments.map((String department) {
+                                    items: getalldepartment.map((getalldepartment) {
+                                      String departmentName =
+                                      getalldepartment.name.toString();
                                       return DropdownMenuItem<String>(
-                                        value: department,
-                                        child: Text(department),
+                                        value: departmentName,
+                                        child: Text(departmentName),
                                       );
                                     }).toList(),
+                                    menuMaxHeight: 400,
+                                    itemHeight: 50,
                                   ),
                                 ],
                               ),
                               actions: <Widget>[
                                 TextButton(
                                   onPressed: () async {// Construct the request
+                                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                                    String token = prefs.getString('token') ?? '';
                                     var authHeaders = {
                                       'sessionKey': 'IjY2MmI2NTk3NjM4ZjIi',
-                                      'token': 'eyJpZCI6MiwibmFtZSI6IkFtYnVsYW5jZSIsImNyZWF0ZWRfYXQiOiIyMDI0LTA1LTI4VDE5OjQ4OjIwLjAwMDAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIn0='
+                                      'token': token
                                     };
 
-                                    var transferRequest = http.MultipartRequest('POST', Uri.parse('http://127.0.0.1:8000/api/patient/transfer'));
-                                    transferRequest.fields.addAll({
-                                      'patient_id': '2',
-                                      'tr_department': '13'
-                                    });
-                                    transferRequest.headers.addAll(authHeaders);
-
-// Send the request
-                                    http.StreamedResponse response = await transferRequest.send();
+                                    http.Response response = http.post(Uri.parse('http://127.0.0.1:8000/api/patient/emtransfer')
+                                      ,body:{
+                                        'patient_id':'${widget.id}',
+                                        'tr_department': '${_selectedDepartmentId}'
+                                    },
+                                    headers:
+                                    {
+                                      'token' : token
+                                    }) as http.Response;
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>AmbulanceScreen(),
+                                      ),);
+// Send the requ
                                     if (response.statusCode == 200) {
-                                      print(await response.stream.bytesToString());
+                                      print('hi');
                                     } else {
-                                    print(response.reasonPhrase);
+                                    print('hiii');
                                     }
-                                    Navigator.of(context).pop();
+
                                   },
                                   child: Text(
                                     "تحويل",
@@ -259,14 +288,17 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
 
                 ElevatedButton(
                   onPressed: () async {
+
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    String token = prefs.getString('token') ?? '';
                     var headers = {
                       'sessionKey': 'IjY2MTFmNTUzNmQzN2Ei',
-                      'token': 'eyJpZCI6MiwibmFtZSI6IkFtYnVsYW5jZSIsImNyZWF0ZWRfYXQiOiIyMDI0LTA1LTI4VDE5OjQ4OjIwLjAwMDAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIn0=',
+                      'token': token,
                     };
 
                     var request = http.MultipartRequest('POST', Uri.parse('http://127.0.0.1:8000/api/emrequest/xray'));
                     request.fields.addAll({
-                      'patient_id': '14',
+                      'patient_id': '${widget.id}',
                     });
 
                     request.headers.addAll(headers);
@@ -291,8 +323,10 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    String token = prefs.getString('token') ?? '';
                     var headers = {
-                      'token': 'eyJpZCI6MiwibmFtZSI6IkFtYnVsYW5jZSIsImNyZWF0ZWRfYXQiOiIyMDI0LTA1LTI4VDE5OjQ4OjIwLjAwMDAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIn0=',
+                      'token': token,
                     };
 
                     var request = http.MultipartRequest('POST', Uri.parse('http://127.0.0.1:8000/api/surgery/emadd'));
@@ -323,9 +357,11 @@ class _PatientDetailsPageState extends State<PatientDetailsPage> {
                 //requestEmergencyTests
                 ElevatedButton(
                   onPressed: () async {
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    String token = prefs.getString('token') ?? '';
                     var headers = {
                       'sessionKey': 'IjY2MTFmNTUzNmQzN2Ei',
-                      'token': 'eyJpZCI6MiwibmFtZSI6IkFtYnVsYW5jZSIsImNyZWF0ZWRfYXQiOiIyMDI0LTA1LTI4VDE5OjQ4OjIwLjAwMDAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIn0=',
+                      'token': token,
                     };
 
                     var request = http.MultipartRequest('POST', Uri.parse('http://127.0.0.1:8000/api/emrequest/test'));

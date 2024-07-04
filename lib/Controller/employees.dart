@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../Models/pationtStaying.dart';
+import '../Models/employees.dart';
 
 
 class emp {
-  Future<PatientInfo> fetchEmployeeData() async {
+  Future<Emp> fetchEmployeeData() async {
     var headers = {
       'Accept': 'application/json',
       'token':
@@ -23,7 +23,7 @@ class emp {
     if (response.statusCode == 200) {
       String responseBody = await response.stream.bytesToString();
       var jsonData = json.decode(responseBody);
-      return PatientInfo.fromJson(jsonData);
+      return Emp.fromJson(jsonData);
     } else {
       throw Exception(response.reasonPhrase);
     }

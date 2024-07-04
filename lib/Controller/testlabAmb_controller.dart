@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Models/testlabAmb_model.dart';
 
@@ -9,10 +10,12 @@ class ShowTestlab_Amb {
 
 
   Future<List<TestLab_Amb>> getAllTestLabAmb() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
     final response = await http.get(Uri.parse('http://127.0.0.1:8000/api/emtest/all'),
         headers: {
           'sessionKey': 'IjY2MTFmNTUzNmQzN2Ei',
-          'token': 'eyJpZCI6NiwibmFtZSI6IkVtZXJnZW5jeVRlc3RMYWIiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9',
+          'token': token,
         });
 
     if (response.statusCode == 200) {
@@ -28,12 +31,14 @@ class ShowTestlab_Amb {
 
 
   Future<void> sendHttpRequest55(int patientId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
     http.Response response = await http.post(
       Uri.parse('http://127.0.0.1:8000/api/emtest/emspatient'),
       headers: {
         'sessionKey': 'IjY2MTFmNTUzNmQzN2Ei',
         'token':
-        'eyJpZCI6NiwibmFtZSI6IkVtZXJnZW5jeVRlc3RMYWIiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9',
+        token,
       },
       body: {
         'patient_id': patientId.toString(),

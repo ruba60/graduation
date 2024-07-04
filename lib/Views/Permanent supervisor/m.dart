@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
-
-import '../admen/Show births.dart';
-import '../admen/View deaths.dart';
+import '../../Logout.dart';
+import '../../Models/Add_Patient.dart';
+import '../../Models/patient.dart';
 import 'Show births.dart';
+import 'View deaths.dart';
 
 class Patient {
   String name;
@@ -23,29 +28,7 @@ class Patient {
       required this.dischargeDate});
 }
 
-List<Patient> _nurseryPatients = [
-  Patient(
-      name: 'خالد',
-      age: 3,
-      diagnosis: 'التهاب رئوي',
-      description: 'يعاني من صعوبة في التنفس وحرارة مرتفعة',
-      admissionDate: DateTime(2022, 05, 01),
-      dischargeDate: DateTime(2022, 05, 10)),
-  Patient(
-      name: 'لينا',
-      age: 1,
-      diagnosis: 'فقر الدم',
-      description: 'تعاني من شحوب وإرهاق شديد',
-      admissionDate: DateTime(2022, 04, 15),
-      dischargeDate: DateTime(2022, 04, 30)),
-  Patient(
-      name: 'سليم',
-      age: 5,
-      diagnosis: 'حساسية الغذاء',
-      description: 'يعاني من طفح جلدي وانتفاخ في الوجه',
-      admissionDate: DateTime(2022, 03, 20),
-      dischargeDate: DateTime(2022, 04, 05)),
-];
+
 
 enum PatientStatus { referred, admitted, nursery }
 
@@ -57,13 +40,15 @@ class morakeb extends StatefulWidget {
 }
 
 class _morakebState extends State<morakeb> {
-  List<Patient> _referredPatients = [];
+  List<AddPatient> _referredPatients = [];
   List<Patient> _nurseryPatients = [];
   // ignore: unused_field
   Patient? _selectedPatient;
   int _selectedIndex = 0;
   // ignore: unused_field
   int _contentIndex = 0;
+
+  get serverUrl => null;
 
   @override
   // ignore: override_on_non_overriding_member
@@ -78,31 +63,33 @@ class _morakebState extends State<morakeb> {
     _loadReferredPatients();
   }
 
+  Future<List<AddPatient>> getData() async {
+    String myUrl = "http://127.0.0.1:8000/api/patient/all";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
+    http.Response response = await http.get(Uri.parse(myUrl), headers: {
+      'Accept': 'application/json',
+      'token': token,
+    });
+    print(jsonDecode(response.body));
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonData = json.decode(response.body) as List<dynamic>;
+      return jsonData.map((json) => AddPatient.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to fetch patient data');
+    }
+  }
+
   void _loadReferredPatients() {
     setState(() {
-      _referredPatients = [
-        Patient(
-            name: 'علي',
-            age: 10,
-            diagnosis: 'نزلات برد',
-            description: 'يعاني من سعال وحرارة',
-            admissionDate: DateTime(2022, 03, 20),
-            dischargeDate: DateTime(2022, 04, 05)),
-        Patient(
-            name: 'فاطمة',
-            age: 5,
-            diagnosis: 'التهاب رئوي',
-            description: 'يعاني من صعوبة في التنفس',
-            admissionDate: DateTime(2022, 03, 20),
-            dischargeDate: DateTime(2022, 04, 05)),
-        Patient(
-            name: 'أحمد',
-            age: 8,
-            diagnosis: 'جروح',
-            description: 'يعاني من جروح في الوجه واليدين',
-            admissionDate: DateTime(2022, 03, 20),
-            dischargeDate: DateTime(2022, 04, 05)),
-      ];
+      getData().then((patientData) {
+        setState(() {
+          _referredPatients = patientData;
+        });
+      }).catchError((error) {
+        // Handle the error
+        print('Error fetching patient data: $error');
+      });;
     });
   }
 
@@ -174,9 +161,9 @@ class _morakebState extends State<morakeb> {
       itemBuilder: (context, index) {
         final patient = _referredPatients[index];
         return ListTile(
-          title: Text(patient.name),
-          subtitle: Text(patient.diagnosis),
-          onTap: () => _selectPatient(patient),
+          title: Text(patient.full_name as String),
+          subtitle: Text(patient.case_description as String),
+          onTap: () => _selectPatient(patient.treatment_required as Patient),
         );
       },
     );
@@ -285,8 +272,8 @@ class _morakebState extends State<morakeb> {
                     : _selectedIndex == 1
                         ? DeathRecordScreen()
                         : _selectedIndex == 2
-                            ? BirthRecordScreen()
-                            : LogoutWidget()),
+                            ? BirthsRecordScreen()
+                            : MainView()),
           ],
         ),
       ),
@@ -302,14 +289,14 @@ class _morakebState extends State<morakeb> {
         final patient = _referredPatients[index];
 
         return ListTile(
-          title: Text(patient.name),
-          subtitle: Text('العمر: ${patient.age}'),
-          onTap: () => _showPatientDetails(patient),
+          title: Text(patient.full_name as String),
+          subtitle: Text('العمر: ${patient.date_of_birth}'),
+          onTap: () => _showPatientDetails(patient as Patient),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               ElevatedButton(
-                  onPressed: () => _admitPatient(patient),
+                  onPressed: () => _admitPatient(patient as Patient),
                   child: Text('طباعة تقرير')),
             ],
           ),
@@ -341,90 +328,4 @@ class _morakebState extends State<morakeb> {
   }
 }
 
-class LogoutWidget extends StatefulWidget {
-  // final Function onLogoutConfirmed; // Callback for successful logout
 
-  const LogoutWidget({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  State<LogoutWidget> createState() => _LogoutWidgetState();
-}
-
-class _LogoutWidgetState extends State<LogoutWidget> {
-  final _departments = [
-    'اسعاف',
-    'مراقب الدوام',
-    'ادمن',
-    'قسم الأطفال',
-    'قسم الهضمية',
-    'قسم العظمية',
-    'قسم النسائية',
-    'قسم الأشعة',
-    'قسم المخابر',
-    'قسم الجراحة',
-    'قسم البولية',
-    'قسم الصدرية',
-    'قسم القلبية',
-    'قسم الجلدية',
-    'قسم الأعصاب',
-  ]; // Replace with actual departments
-  String? _selectedDepartment;
-  final _passwordController = TextEditingController();
-  bool _isPasswordIncorrect = false;
-
-  void _handleLogoutPressed() async {
-    // Simulate authentication logic (replace with actual API call or verification)
-    if (_selectedDepartment != null &&
-        _passwordController.text == 'correct_password') {
-      setState(() {
-        _isPasswordIncorrect = false;
-      });
-      //widget.onLogoutConfirmed(); // Call the callback to handle logout actions
-    } else {
-      setState(() {
-        _isPasswordIncorrect = true;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('الانتقال الى قسم اخر'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DropdownButtonFormField<String>(
-            value: _selectedDepartment,
-            decoration: InputDecoration(labelText: 'اختر القسم'),
-            items: _departments.map((String department) {
-              return DropdownMenuItem<String>(
-                value: department,
-                child: Text(department),
-              );
-            }).toList(),
-            onChanged: (String? newValue) =>
-                setState(() => _selectedDepartment = newValue),
-            validator: (value) => value == null ? 'يجب اختيار قسم' : null,
-          ),
-          SizedBox(height: 30),
-          TextField(
-            controller: _passwordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: 'كلمة المرور',
-              errorText: _isPasswordIncorrect ? 'كلمة المرور غير صحيحة' : null,
-            ),
-          ),
-          SizedBox(height: 30),
-          ElevatedButton(
-            onPressed: _handleLogoutPressed,
-            child: Text(' تاكيد'),
-          ),
-        ],
-      ),
-    );
-  }
-}

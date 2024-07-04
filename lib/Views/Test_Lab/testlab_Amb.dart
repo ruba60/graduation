@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../Controller/testlabAmb_controller.dart';
+import '../../Logout.dart';
 import '../../Models/testlabAmb_model.dart';
 
 class TestLaB_Amb extends StatefulWidget {
@@ -62,8 +63,8 @@ class _TestLaB_AmbState extends State<TestLaB_Amb> {
             Icons.arrow_back_sharp,
           ),
           onPressed: () {
-            // Navigator.push(
-            //     context, MaterialPageRoute(builder: (context) => HomePage()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MainView()));
           },
         ),
         title: const Text(

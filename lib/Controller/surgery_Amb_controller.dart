@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Models/surgary_Amb_model.dart';
 
@@ -9,11 +10,13 @@ class ShowSurgery_Amb {
   var serverUrl = "http://127.0.0.1:8000";
 
   Future<List<Surgery_Amb>> getData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
     String myUrl = "$serverUrl/api/surgery/emall";
 
     http.Response response = await http.get(Uri.parse(myUrl), headers: {
       'Accept': 'application/json',
-      'token': 'eyJpZCI6MTcsIm5hbWUiOiJFbWVyZ2VuY3kgU3VyZ2VyeSBEZXBhcnRtZW50IiwiY3JlYXRlZF9hdCI6IjIwMjQtMDYtMjlUMTQ6MDA6MDQuMDAwMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI0LTA2LTI5VDE0OjAwOjA0LjAwMDAwMFoifQ=='
+      'token': token
  });
     print(jsonDecode(response.body));
     if (response.statusCode == 200) {
@@ -25,10 +28,12 @@ class ShowSurgery_Amb {
   }
 
   Future<List<Surgery_Amb>> getAllSurgeries() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
     final url = Uri.parse('http://127.0.0.1:8000/api/surgery/emall');
     final headers = {
       'token':
-      'eyJpZCI6MTcsIm5hbWUiOiJFbWVyZ2VuY3kgU3VyZ2VyeSBEZXBhcnRtZW50IiwiY3JlYXRlZF9hdCI6IjIwMjQtMDYtMjlUMTQ6MDA6MDQuMDAwMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI0LTA2LTI5VDE0OjAwOjA0LjAwMDAwMFoifQ==',
+      token,
     };
 
     final response = await http.get(url, headers: headers);
@@ -44,12 +49,14 @@ class ShowSurgery_Amb {
 //بعد التصحيح
 
   Future<void> sendHttpRequest77(int patientId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
     http.Response response = await http.post(
       Uri.parse('http://127.0.0.1:8000/api/surgery/emqueue'),
       headers: {
         'sessionKey': 'IjY2MTFmNTUzNmQzN2Ei',
         'token':
-        'eyJpZCI6MTcsIm5hbWUiOiJFbWVyZ2VuY3kgU3VyZ2VyeSBEZXBhcnRtZW50IiwiY3JlYXRlZF9hdCI6IjIwMjQtMDYtMjlUMTQ6MDA6MDQuMDAwMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI0LTA2LTI5VDE0OjAwOjA0LjAwMDAwMFoifQ==',
+        token,
       },
       body: {
         'patient_id': patientId.toString(),

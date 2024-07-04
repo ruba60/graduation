@@ -28,7 +28,7 @@ class _DeathRecordScreenState extends State<DeathRecordScreen> {
     http.Response response = await http.get(Uri.parse(myUrl), headers: {
       'Accept': 'application/json',
       'token':
-      'eyJpZCI6MSwibmFtZSI6IklUQWRtaW4iLCJjcmVhdGVkX2F0IjpudWxsLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0yMVQxOTozOToxMS4wMDAwMDBaIn0='
+      'eyJpZCI6OCwibmFtZSI6IkFkbWlzc2lvbk1vbml0b3IiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9'
     });
     final responseData = json.decode(response.body);
     print(responseData);
@@ -52,20 +52,16 @@ class _DeathRecordScreenState extends State<DeathRecordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
-        backgroundColor: Colors.blue[600],
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white60,
         centerTitle: true,
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Dashboard()),
-              );
-            }),
+
+
         title: Text(
           'قسم الوفيات في المشفى الوطني للسويداء',
-          style: TextStyle(color: Colors.white, fontSize: 20),
+          style: TextStyle(color: Colors.blue[600], fontSize: 20,fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -115,22 +111,7 @@ class _DeathRecordScreenState extends State<DeathRecordScreen> {
                             Row(
                               children: [
                                 ElevatedButton(
-                                  onPressed: () async {
-                                    var headers = {
-                                      'token': 'eyJpZCI6MSwibmFtZSI6IklUQWRtaW4iLCJjcmVhdGVkX2F0IjpudWxsLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0yMVQxOTozOToxMS4wMDAwMDBaIn0=',
-                                    };
-
-                                    var request = http.MultipartRequest('DELETE', Uri.parse('http://127.0.0.1:8000/api/deaths/delete/1'));
-                                    request.headers.addAll(headers);
-
-                                    http.StreamedResponse response = await request.send();
-
-                                    if (response.statusCode == 200) {
-                                      print(await response.stream.bytesToString());
-                                    } else {
-                                    print(response.reasonPhrase);
-                                    }
-                                  },
+                                  onPressed: () {},
                                   child: Text(
                                     'حذف',
                                     style: TextStyle(

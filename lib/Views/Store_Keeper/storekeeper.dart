@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Logout.dart';
 import '../../Models/storekeepermodel.dart';
 import '../../controller/storekeepercontroller.dart';
 
@@ -40,7 +41,7 @@ class _StoreKeeperState extends State<StoreKeeper> {
       http.Response response = await http.post(Uri.parse(myUrl), headers: {
         'Accept': 'application/json',
         'token':
-            'eyJpZCI6OSwibmFtZSI6Ik1lZGljaW5lU3RvcmVLZWVwZXIiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9'
+        token
       }, body: {
         "name": name,
         "end_date": end_date,
@@ -98,8 +99,7 @@ class _StoreKeeperState extends State<StoreKeeper> {
       http.Response response = await http.post(Uri.parse(myUrl), headers: {
         'Accept': 'application/json',
         'token':
-            'eyJpZCI6OSwibmFtZSI6Ik1lZGljaW5lU3RvcmVLZWVwZXIiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9'
-        //
+token        //
       }, body: {
         "name": name,
 
@@ -156,7 +156,7 @@ class _StoreKeeperState extends State<StoreKeeper> {
     http.Response response = await http.delete(Uri.parse(myUrl), headers: {
       'Accept': 'application/json',
       'token':
-          'eyJpZCI6OSwibmFtZSI6Ik1lZGljaW5lU3RvcmVLZWVwZXIiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9'
+      token
     });
     // final responseData = json.decode(response.body);
     // print(responseData);
@@ -184,6 +184,15 @@ class _StoreKeeperState extends State<StoreKeeper> {
       appBar: AppBar(
         backgroundColor: Colors.blue,
         title: Text("مستودع الأدوية و المستلزمات الطبية "),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_sharp,
+          ),
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MainView()));
+          },
+        ),
       ),
       body: Column(
         children: [
@@ -255,7 +264,7 @@ class _StoreKeeperState extends State<StoreKeeper> {
                                               //name
                                               TextFormField(
                                                 controller:
-                                                    name_drag_Controller,
+                                                name_drag_Controller,
                                                 decoration: InputDecoration(
                                                     labelText: 'الاسم  '),
                                               ),
@@ -263,7 +272,7 @@ class _StoreKeeperState extends State<StoreKeeper> {
                                               //quantity
                                               TextFormField(
                                                 controller:
-                                                    quantity_drag_Controller,
+                                                quantity_drag_Controller,
                                                 decoration: InputDecoration(
                                                     labelText: 'الكمية  '),
                                               ),
@@ -305,7 +314,7 @@ class _StoreKeeperState extends State<StoreKeeper> {
                                             //   });
                                             //   Navigator.of(context).pop();
                                             // }
-                                          //  editData( (s.id ?? 0) as String,name_drag_Controller.text, quantity_drag_Controller.text);
+                                            //  editData( (s.id ?? 0) as String,name_drag_Controller.text, quantity_drag_Controller.text);
                                             editData(s.id.toString(), name_drag_Controller.text, quantity_drag_Controller.text);
                                             Navigator.of(context).pop();
                                           },
@@ -355,7 +364,7 @@ class _StoreKeeperState extends State<StoreKeeper> {
                             },
                             controller: name_drag_Controller,
                             decoration:
-                                const InputDecoration(labelText: 'الاسم '),
+                            const InputDecoration(labelText: 'الاسم '),
                           ),
 
                           //expriy_date
@@ -396,7 +405,7 @@ class _StoreKeeperState extends State<StoreKeeper> {
 
                             controller: quantity_drag_Controller,
                             decoration:
-                                const InputDecoration(labelText: 'الكمية '),
+                            const InputDecoration(labelText: 'الكمية '),
                             //  keyboardType: TextInputType.number,
                           ),
 

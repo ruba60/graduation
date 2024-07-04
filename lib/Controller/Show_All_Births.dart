@@ -3,14 +3,15 @@ import 'package:http/http.dart' as http;
 
 
 import '../Models/AllDeaths.dart';
+import '../Models/All_Births.dart';
 
 
 
-class ShowAllDeaths {
+class ShowAllBirths {
   var serverUrl = "http://127.0.0.1:8000";
 
-  Future<List<AllDeaths>> getData() async {
-    String myUrl = "$serverUrl/api/deaths/all";
+  Future<List<AllBirths>> getData() async {
+    String myUrl = "$serverUrl/api/births/all";
 
     http.Response response = await http.get(Uri.parse(myUrl), headers: {
       'Accept': 'application/json',
@@ -18,7 +19,7 @@ class ShowAllDeaths {
     print(jsonDecode(response.body));
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map((json) => AllDeaths.fromJson(json)).toList();
+      return jsonData.map((json) => AllBirths.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch death data');
     }

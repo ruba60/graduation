@@ -1,10 +1,10 @@
-class ResidentPatient {
+class ResidentPatientModel {
   Information? information;
   String? residentPatient;
 
-  ResidentPatient({this.information, this.residentPatient});
+  ResidentPatientModel({this.information, this.residentPatient});
 
-  ResidentPatient.fromJson(Map<String, dynamic> json) {
+  ResidentPatientModel.fromJson(Map<String, dynamic> json) {
     information = json['information '] != null
         ? new Information.fromJson(json['information '])
         : null;

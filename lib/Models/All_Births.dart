@@ -6,8 +6,7 @@ class AllBirths {
   String? birthDate;
   String? city;
   String? nationalId;
-  Null? createdAt;
-  Null? updatedAt;
+
 
   AllBirths(
       {this.id,
@@ -17,8 +16,7 @@ class AllBirths {
         this.birthDate,
         this.city,
         this.nationalId,
-        this.createdAt,
-        this.updatedAt});
+      });
 
   AllBirths.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -28,8 +26,7 @@ class AllBirths {
     birthDate = json['birth_date'];
     city = json['city'];
     nationalId = json['national_id'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+
   }
 
   Map<String, dynamic> toJson() {
@@ -41,8 +38,7 @@ class AllBirths {
     data['birth_date'] = this.birthDate;
     data['city'] = this.city;
     data['national_id'] = this.nationalId;
-    data['created_at'] = this.createdAt;
-    data['updated_at'] = this.updatedAt;
+
     return data;
   }
 }

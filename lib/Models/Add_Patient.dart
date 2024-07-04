@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 class AddPatient {
+  int? id;
   String? full_name;
   String? address;
   String? mom_name;
-  String? chain;
+  int? chain;
   String? gender;
-  DateTime? date_of_birth;
+  String? date_of_birth;
   String? case_description;
   String? treatment_required;
 
-  AddPatient({this.full_name,
+  AddPatient({this.id,
+    this.full_name,
   this.address,
   this.mom_name,
   this.chain,
@@ -20,6 +22,7 @@ class AddPatient {
   this.treatment_required});
 
   AddPatient.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
     full_name = json['full_name'];
     address = json['address'];
     mom_name = json['mom_name'];
@@ -28,10 +31,12 @@ class AddPatient {
     date_of_birth = json['date_of_birth'];
     case_description = json['case_description'];
     treatment_required = json['treatment_required'];
+
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
     data['full_name'] = this.full_name;
     data['address'] = this.address;
     data['mom_name'] = this.mom_name;
@@ -42,4 +47,6 @@ class AddPatient {
     data['treatment_required'] = this.treatment_required;
     return data;
   }
+
+
 }

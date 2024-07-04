@@ -1,29 +1,30 @@
-class PatientFile {
+class Pationt_File {
   PatientInfo? patientInfo;
   String? dep;
   String? lastDepartment;
   Other? other;
 
-  PatientFile({this.patientInfo, this.dep, this.lastDepartment, this.other});
+  Pationt_File({this.patientInfo, this.dep, this.lastDepartment, this.other});
 
-  PatientFile.fromJson(Map<String, dynamic> json) {
-    patientInfo = json['patient_info'] != null
-        ? new PatientInfo.fromJson(json['patient_info'])
+  Pationt_File.fromJson(Map<String, dynamic> json) {
+    patientInfo = json['patient_info : '] != null
+        ? new PatientInfo.fromJson(json['patient_info : '])
         : null;
-    dep = json['dep'];
-    lastDepartment = json['last_department'];
-    other = json['other'] != null ? new Other.fromJson(json['other']) : null;
+    dep = json[' dep : '];
+    lastDepartment = json[' last_department : '];
+    other =
+        json[' other: '] != null ? new Other.fromJson(json[' other: ']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.patientInfo != null) {
-      data['patient_info'] = this.patientInfo!.toJson();
+      data['patient_info : '] = this.patientInfo!.toJson();
     }
-    data['dep'] = this.dep;
-    data['last_department'] = this.lastDepartment;
+    data[' dep : '] = this.dep;
+    data[' last_department : '] = this.lastDepartment;
     if (this.other != null) {
-      data['other'] = this.other!.toJson();
+      data[' other: '] = this.other!.toJson();
     }
     return data;
   }
@@ -44,16 +45,16 @@ class PatientInfo {
 
   PatientInfo(
       {this.id,
-        this.fullName,
-        this.address,
-        this.dateOfBirth,
-        this.momName,
-        this.chain,
-        this.gender,
-        this.caseDescription,
-        this.treatmentRequired,
-        this.createdAt,
-        this.updatedAt});
+      this.fullName,
+      this.address,
+      this.dateOfBirth,
+      this.momName,
+      this.chain,
+      this.gender,
+      this.caseDescription,
+      this.treatmentRequired,
+      this.createdAt,
+      this.updatedAt});
 
   PatientInfo.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -98,13 +99,13 @@ class Other {
 
   Other(
       {this.id,
-        this.departmentId,
-        this.patientId,
-        this.testResult,
-        this.xRayResult,
-        this.resident,
-        this.createdAt,
-        this.updatedAt});
+      this.departmentId,
+      this.patientId,
+      this.testResult,
+      this.xRayResult,
+      this.resident,
+      this.createdAt,
+      this.updatedAt});
 
   Other.fromJson(Map<String, dynamic> json) {
     id = json['id'];

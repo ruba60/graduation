@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../Logout.dart';
 import '../Permanent supervisor/m.dart';
 import '../admen/dash.dart';
 import '../admen/departments.dart';
@@ -15,6 +18,7 @@ class Hr extends StatefulWidget {
 }
 
 class _HrState extends State<Hr> {
+
   int _selectedIndex = 0;
 
   void _onItemTapped(int index) {
@@ -102,7 +106,7 @@ class _HrState extends State<Hr> {
                       ? EmployeesScreen()
                       : _selectedIndex == 2
                           ? const AddDepartmentScreen()
-                          : const LogoutWidget()),
+                          :  MainView()),
         ],
       ),
     );

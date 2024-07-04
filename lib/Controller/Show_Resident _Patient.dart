@@ -8,7 +8,7 @@ import '../Models/patient.dart';
 class ShowResidentPatient {
   var serverUrl = "http://127.0.0.1:8000";
 
-  Future<List<ResidentPatient>> getData() async {
+  Future<List<ResidentPatientModel>> getData() async {
     String myUrl = "$serverUrl/api/dep/get_residents";
 
     http.Response response = await http.post(Uri.parse(myUrl), headers: {
@@ -18,7 +18,7 @@ class ShowResidentPatient {
     print(jsonDecode(response.body));
     if (response.statusCode == 200) {
       final List<dynamic> jsonData = json.decode(response.body);
-      return jsonData.map((json) => ResidentPatient.fromJson(json)).toList();
+      return jsonData.map((json) => ResidentPatientModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to fetch patient data');
     }

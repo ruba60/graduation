@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 import '../../Controller/show_patient.dart';
+import '../../Models/Add_Patient.dart';
 import '../../login.dart';
 
 
@@ -39,38 +41,23 @@ class AmbulanceScreen extends StatefulWidget {
 class _AmbulanceScreenState extends State<AmbulanceScreen> {
   String? _selectedDepartment;
 
-  List<PatientModel> p = [];
+  List<AddPatient> p = [];
   ShowPatient showPatient = ShowPatient();
   final _passwordController = TextEditingController();
   bool? _isPasswordIncorrect;
-  List<dynamic> patients = [
-    Patient(
-        name: 'محمد',
-        status: 'حرجة',
-        treatment: 'تنفس اصطناعي',
-        entryTime: '10:30 ص'),
-    Patient(
-        name: 'أحمد',
-        status: 'متوسطة',
-        treatment: 'تثبيت كسر',
-        entryTime: '11:15 ص'),
-    Patient(
-        name: 'سارة',
-        status: 'خفيفة',
-        treatment: 'تنظيف جرح',
-        entryTime: '12:00 م'),
-  ];
+
   List<dynamic> data = [];
   var serverUrl = "http://127.0.0.1:8000";
 
   Future<void> fetchData() async {
+    print('hi');
     String myUrl = "$serverUrl/api/dep/patients";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString('token') ?? '';
     http.Response response = await http.get(Uri.parse(myUrl), headers: {
       'Accept': 'application/json',
       'token':
-          'eyJpZCI6MiwibmFtZSI6IkFtYnVsYW5jZSIsImNyZWF0ZWRfYXQiOiIyMDI0LTA1LTI4VDE5OjQ4OjIwLjAwMDAwMFoiLCJ1cGRhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIn0=',
+          token,
     });
     final responseData = json.decode(response.body);
     print(responseData);
@@ -99,13 +86,16 @@ class _AmbulanceScreenState extends State<AmbulanceScreen> {
       appBar: AppBar(
         backgroundColor: Colors.blue[600],
         centerTitle: true,
-        leading: IconButton(
+        leading:
+        IconButton(
           icon: Icon(Icons.logout, color: Colors.white),
           onPressed: () async {
+            SharedPreferences prefs = await SharedPreferences.getInstance();
+            String token = prefs.getString('token') ?? '';
             var headers = {
               'sessionKey': 'IjY2M2E1ZjRkMjMzZjAi',
               'token':
-              'eyJpZCI6MiwibmFtZSI6Ilx1MDY0Mlx1MDYzM1x1MDY0NSBcdTA2MjdcdTA2NDRcdTA2MjdcdTA2MzNcdTA2MzlcdTA2MjdcdTA2NDEiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9'
+              token,
             };
             var request = http.Request('POST', Uri.parse('http://127.0.0.1:8000/api/logout'));
 
@@ -153,26 +143,41 @@ class _AmbulanceScreenState extends State<AmbulanceScreen> {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 // crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AddPatient()),
-                      );
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                          Colors.blue.shade700),
-                    ),
-                    child: Text(
-                      'إضافة مريض',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.0,
+                children: [Positioned(
+                left: 16.0,
+                right: 16.0,
+                top: 32.0,
+                bottom: 32.0,
+                child:
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Add()),
+                    );
+                  },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                        Colors.blue.shade700),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Positioned(
+                      left: 32.0,
+                      right: 32.0,
+                      top: 32.0,
+                      bottom: 32.0,
+                      child:Text(
+                        'إضافة مريض',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                        ),
                       ),
                     ),
                   ),
+                ),
+                ),
                 ]),
           ),
           SizedBox(
@@ -184,31 +189,57 @@ class _AmbulanceScreenState extends State<AmbulanceScreen> {
               child: ListView.builder(
                 itemCount: p.length,
                 itemBuilder: (context, index) {
-                  // final patient = p[index];
                   return Card(
                     margin: EdgeInsets.all(10),
                     color: Colors.blue[100],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
                     child: ListTile(
                       title: Padding(
                         padding: EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text("${p[index].patientName}",
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold)),
+                            Text(
+                              "${p[index].full_name}",
+                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
                             SizedBox(height: 8),
-                            // Text(
-                            //     'الحالة: ${patients[index].status}    القسم: ${_selectedDepartment ?? 'غير محدد'}'),
+                            Text(
+                              "${p[index].case_description}",
+                              style: TextStyle(fontSize: 16),
+                            ),
                           ],
                         ),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              // إجراء العمل عند الضغط على الزر "العرض"
+                            },
+                            child: Text('العرض'),
+                          ),
+                          SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              // إجراء العمل عند الضغط على الزر "تعديل"
+                            },
+                            child: Text('تعديل'),
+                          ),
+                        ],
                       ),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => PatientDetailsPage(
-                              full_name: p[index].patientName,
+                              full_name: p[index].full_name,
+                              treatmentRequired: p[index].treatment_required,
+                              caseDescription: p[index].case_description,
+                              id: p[index].id.toString(),
                             ),
                           ),
                         );

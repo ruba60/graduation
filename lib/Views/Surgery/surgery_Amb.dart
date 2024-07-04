@@ -4,7 +4,9 @@ import 'package:http/http.dart' as http ;
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+
 import '../../Controller/surgery_Amb_controller.dart';
+import '../../Logout.dart';
 import '../../Models/surgary_Amb_model.dart';
 
 
@@ -31,7 +33,7 @@ class _SurgeryAmbState extends State<SurgeryAmb> {
     http.Response response = await http.get(Uri.parse(myUrl), headers: {
       'Accept': 'application/json',
 
-      'token':'eyJpZCI6MTYsIm5hbWUiOiJzdXJnZXJ5IGRlcGFydG1lbnQgKFx1MDY0Mlx1MDYzM1x1MDY0NSBcdTA2MjdcdTA2NDRcdTA2MzlcdTA2NDVcdTA2NDRcdTA2NGFcdTA2MjdcdTA2MmEpIiwiY3JlYXRlZF9hdCI6IjIwMjQtMDYtMjZUMjA6NDU6MTEuMDAwMDAwWiIsInVwZGF0ZWRfYXQiOiIyMDI0LTA2LTI2VDIwOjQ1OjExLjAwMDAwMFoifQ=='
+      'token':token
     });
     final responseData = json.decode(response.body);
     print(responseData);
@@ -62,8 +64,8 @@ class _SurgeryAmbState extends State<SurgeryAmb> {
             Icons.arrow_back_sharp,
           ),
           onPressed: () {
-            // Navigator.push(
-            //     context, MaterialPageRoute(builder: (context) => HomePage()));
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MainView()));
           },
         ),
         title: const Text(

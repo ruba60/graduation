@@ -7,17 +7,17 @@ import 'package:http/http.dart' as http;
 import '../../Controller/Add_Patient.dart';
 import 'Ambulance.dart';
 
-class AddPatient extends StatefulWidget {
+class Add extends StatefulWidget {
   @override
   _AddPatientState createState() => _AddPatientState();
 
 }
 
-class _AddPatientState extends State<AddPatient> {
+class _AddPatientState extends State<Add> {
   AddPatientController add =AddPatientController();
 
-  List<String> dropdown = ['ذكر', 'انثى'];
-  String v = 'ذكر';
+  List<String> dropdown = ['male', 'female'];
+  String v = 'male';
 
 
   int _chain = 0;
@@ -45,14 +45,16 @@ class _AddPatientState extends State<AddPatient> {
       String case_description) async {
     var serverUrl = "http://127.0.0.1:8000";
     String myUrl = "$serverUrl/api/patient/add";
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('token') ?? '';
     http.Response response = await http.post(Uri.parse(myUrl), headers: {
       'sessionKey' : 'IjY2M2E1ZjRkMjMzZjAi',
       'token':
-      'eyJpZCI6MiwibmFtZSI6Ilx1MDY0Mlx1MDYzM1x1MDY0NSBcdTA2MjdcdTA2NDRcdTA2MjdcdTA2MzNcdTA2MzlcdTA2MjdcdTA2NDEiLCJjcmVhdGVkX2F0IjoiMjAyNC0wNS0yOFQxOTo0ODoyMC4wMDAwMDBaIiwidXBkYXRlZF9hdCI6IjIwMjQtMDUtMjhUMTk6NDg6MjAuMDAwMDAwWiJ9='
+      token
     }, body: {
       "full_name": full_name,
       "address": address,
-      "date_of_birth": date_of_birth,
+      "date_of_birth": date_of_birth.toString(),
       "mom_name": mom_name,
       "chain": chain,
       "gender": gender,
@@ -214,7 +216,7 @@ class _AddPatientState extends State<AddPatient> {
                             ),
                             Expanded(
                               child: TextFormField(
-                                controller: motherConroller,
+                                controller: momNameController,
                                 decoration: InputDecoration(
                                   labelText: 'اسم الأم',
                                 ),
@@ -225,7 +227,7 @@ class _AddPatientState extends State<AddPatient> {
                                   return null;
                                 },
                                 onSaved: (value) {
-                                  motherConroller.text = value!;
+                                  momNameController.text = value!;
                                 },
                               ),
                             ),
@@ -259,7 +261,7 @@ class _AddPatientState extends State<AddPatient> {
                             SizedBox(width: 20),
                             Expanded(
                               child: TextFormField(
-                                // controller: chainController,
+                                controller: chainController,
                                 decoration: InputDecoration(
                                   labelText: 'القيد',
                                 ),
@@ -308,9 +310,14 @@ class _AddPatientState extends State<AddPatient> {
                           children: [
                             ElevatedButton(
                               onPressed: () {
+                                print(momNameController.text);
                                 addpatient(
-                                    fullNameController.text,addressController.text,patientDate,
-                                    momNameController.text,chainController.text, v,
+                                    fullNameController.text,
+                                    addressController.text,
+                                    patientDate,
+                                    momNameController.text,
+                                    chainController.text,
+                                    v,
                                     caseDescriptionController.text,
                                     treatmentRequiredController.text);
                                 Navigator.push(
